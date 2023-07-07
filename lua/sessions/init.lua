@@ -1,4 +1,5 @@
 local util = require("sessions.util")
+local lfs = require "lfs"
 
 local levels = vim.log.levels
 
@@ -38,12 +39,53 @@ local safe_path = function(path)
     end
 end
 
+-- check if a directory exists
+local function directoryExists(path)
+    local baseDir = path:match("^(.+[/\\])")
+    local attrs = lfs.attributes(baseDir)
+    return attrs and attrs.mode == "directory"
+end
+
 -- given a path (possibly empty or nil) returns the absolute session path or
 -- the default session path if it exists. Will create intermediate directories
 -- as needed. Returns nil otherwise.
 local get_session_path = function(path, ensure)
     ensure = ensure or true
 
+    if config.absolute and not config.session_filepath then
+        vim.notify("sessions.nvim: config.session_filepath must be set when config.absolute=true", levels.ERROR)
+        return nil
+    end
+
+    -- deault path if abs=true, else curr dir
+    local defaultBasePath = config.absolute
+        and vim.fn.expand(config.session_filepath, ":p")
+        or vim.fn.fnamemodify(vim.fn.getcwd(), ":p")
+
+    if path and path ~= "" then
+        local inputPath = vim.fn.expand(path, ":p")
+        local inputPathBaseDirExists = directoryExists(inputPath)
+
+        --   if path is full path (i.e., path starts with /), use as is
+        if string.sub(inputPath, 1, 1) == "/" and inputPathBaseDirExists then
+            return inputPath
+        end
+
+        --   if path is relative (may or may not contain slashes), append to basepath
+        if defaultBasePath then
+            return defaultBasePath .. util.path.sep .. inputPath
+        end
+    else
+        --   if path is not provided:
+        --     if absolute=true, save in curr_dir-session.vim in base_path
+        --     if absolute=false, save in session.vim in cwd
+        --   TODO: prompt for session name or to select an existing session
+        vim.notify("sessions.nvim: session name is currently required", levels.ERROR)
+        return nil
+    end
+
+    --[=====[
+    -- old logic:
     if path and path ~= "" then
         path = vim.fn.expand(path, ":p")
     elseif config.session_filepath ~= "" then
@@ -61,6 +103,7 @@ local get_session_path = function(path, ensure)
         end
         return path
     end
+    --]=====]
 
     return nil
 end
@@ -225,7 +268,7 @@ M.setup = function(opts)
     config = util.merge(config, opts)
 
     -- register commands
-    vim.cmd[[
+    vim.cmd [[
     command! -bang -nargs=* -complete=file SessionsSave lua require("sessions").parse_args("save", "<bang>", { <f-args> })
     command! -bang -nargs=* -complete=file SessionsLoad lua require("sessions").parse_args("load", "<bang>", { <f-args> })
     command! -bang SessionsStop lua require("sessions").parse_args("stop", "<bang>")
