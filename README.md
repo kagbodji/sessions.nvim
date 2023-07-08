@@ -108,7 +108,7 @@ require("sessions").setup({
 ```
 
 In this eaxmple, the command `SessionsSave foo` will write the
-session file [cwd]/.nvim/session/foo
+session file `[cwd]/.nvim/session/foo`
 
 When absolute is true, the `session_filepath` will store all session files.
 In the following example, all session files will be stored in the nvim data/sessions
@@ -123,7 +123,7 @@ require("sessions").setup({
 ```
 
 With `absolute = true` the command `SessionsSave foo` will write
-the session file ~/.local/share/nvim/sessions/.nvim/session/foo
+the session file `~/.local/share/nvim/sessions/.nvim/session/foo`
 
 **NOTE**: this is how I personally use the plugin. I have a shell function
 which creates and tracks a session whenever I start work on a new PR.

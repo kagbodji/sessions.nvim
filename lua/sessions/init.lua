@@ -3,6 +3,8 @@ local lfs = require "lfs"
 
 local levels = vim.log.levels
 
+-- TODO: add session delete
+
 -- default configuration
 local config = {
     -- events which trigger a session save
