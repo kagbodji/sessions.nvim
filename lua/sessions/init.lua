@@ -42,6 +42,10 @@ end
 -- check if a directory exists
 local function directoryExists(path)
     local baseDir = path:match("^(.+[/\\])")
+    if not baseDir then
+        return false
+    end
+
     local attrs = lfs.attributes(baseDir)
     return attrs and attrs.mode == "directory"
 end
@@ -156,6 +160,7 @@ end
 ---@param path string|nil
 ---@param opts table
 M.save = function(path, opts)
+    -- TODO: prompt overwrite if file exists
     opts = util.merge({
         autosave = true,
     }, opts)
