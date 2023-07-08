@@ -52,15 +52,15 @@ end
 local get_session_path = function(path, ensure)
     ensure = ensure or true
 
-    if config.absolute and not config.session_filepath then
-        vim.notify("sessions.nvim: config.session_filepath must be set when config.absolute=true", levels.ERROR)
-        return nil
-    end
+    -- if config.absolute and not config.session_filepath then
+    --     vim.notify("sessions.nvim: config.session_filepath must be set when config.absolute=true", levels.ERROR)
+    --     return nil
+    -- end
 
     -- deault path if abs=true, else curr dir
     local defaultBasePath = config.absolute
         and vim.fn.expand(config.session_filepath, ":p")
-        or vim.fn.fnamemodify(vim.fn.getcwd(), ":p")
+        or vim.fn.fnamemodify(vim.fn.getcwd(), ":p") .. util.path.sep .. config.session_filepath
 
     if path and path ~= "" then
         local inputPath = vim.fn.expand(path, ":p")

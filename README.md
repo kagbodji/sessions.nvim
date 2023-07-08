@@ -2,33 +2,30 @@
 
 a simple session manager plugin
 
-### Notice
-**I don't use Neovim regularly anymore.** I keep this plugin up because many people use it, and it is mostly easy to maintain. But I would appreciate someone to help me maintain it! Just let me know on the [issue thread](https://github.com/natecraddock/sessions.nvim/issues/3).
-
 ---
 
 Neovim (and Vim) support saving and loading of sessions (windows, tabs, buffers,
 etc), but the interface isn't the easiest to use.
 
-* `:mksession <file>` is required to save a session, and sessions are loaded with `nvim
-  -S <file>` or `:source <file>`. If the file already exists, a bang is required
+- `:mksession <file>` is required to save a session, and sessions are loaded with `nvim
+-S <file>` or `:source <file>`. If the file already exists, a bang is required
   `mksession! <file>`. This is a bit tedious and annoying when you do it wrong
   the first time.
-* If the directories in the session filepath do not exist, `:mksession` will
+- If the directories in the session filepath do not exist, `:mksession` will
   fail.
-* It is easy to forget saving a session.
+- It is easy to forget saving a session.
 
 sessions.nvim is a lightweight wrapper around `:mksession` that adds a small
 amount of pixie dust to make sessions management more simple and enjoyable.
 
-* The commands `:SessionsSave` and `:SessionsLoad` are used to save and load
+- The commands `:SessionsSave` and `:SessionsLoad` are used to save and load
   session files.
-* Further changes to the session are automatically saved to the session file
+- Further changes to the session are automatically saved to the session file
   after saving or loading a session.
-* Session files created with sessions.nvim are independent of the plugin;
-  loading with `nvim -S` or `:source` will *not* start autosaving.
-* Intermediate directories are automatically created.
-* A default session filepath may be customized.
+- Session files created with sessions.nvim are independent of the plugin;
+  loading with `nvim -S` or `:source` will _not_ start autosaving.
+- Intermediate directories are automatically created.
+- A default session filepath may be customized.
 
 sessions.nvim does not do anything automatically. Sessions will not be saved or
 loaded until a command or an API function is called. This is to keep the plugin
@@ -39,7 +36,7 @@ around `:mksession` and `:source`, not to provide workspace management.
 project directory if that is what you desire. It also wouldn't be difficult to
 write an autocommand to load session files on nvim startup.
 
-This readme covers *most* of the features of sessions.nvim, but full
+This readme covers _most_ of the features of sessions.nvim, but full
 documentation is found in the help file `:h sessions`.
 
 Note that this plugin is small in scope and complexity. It has been stable for a
@@ -90,6 +87,8 @@ The setup function accepts a table to modify the default configuration:
     --
     -- if a path is provided here, then the path argument for commands and API
     -- functions will use session_filepath as a default if no path is provided.
+    -- that is, if you provide a session name without a path, the path will be
+    -- appended to the session name.
     session_filepath = "",
 
     -- treat the default session filepath as an absolute path
@@ -108,6 +107,9 @@ require("sessions").setup({
 })
 ```
 
+In this eaxmple, the command `SessionsSave foo` will write the
+session file [cwd]/.nvim/session/foo
+
 When absolute is true, the `session_filepath` will store all session files.
 In the following example, all session files will be stored in the nvim data/sessions
 directory (`~/.local/share/nvim/sessions` on a Unix-like system)
@@ -120,23 +122,35 @@ require("sessions").setup({
 })
 ```
 
+With `absolute = true` the command `SessionsSave foo` will write
+the session file ~/.local/share/nvim/sessions/.nvim/session/foo
+
+**NOTE**: this is how I personally use the plugin. I have a shell function
+which creates and tracks a session whenever I start work on a new PR.
+
+```bash
+function vs() {
+    nvim -c "lua local sessions = require('sessions'); sessions.save('${session}')" $@
+}
+```
+
 This version is compatible with Neovim 0.6 and newer.
 
 ## Commands
 
 The setup function registers the following commands:
 
-* `:SessionsSave[!] [path]`
+- `:SessionsSave[!] [path]`
 
   Save a session file to the given path. If the path exists it will be
   overwritten. Starts autosaving the session on the configured events.
 
-* `:SessionsLoad[!] [path]`
+- `:SessionsLoad[!] [path]`
 
   Load a session file from the given path. If the path does not exist no session
   will be loaded. Starts autosaving changes to the session after loading.
 
-* `:SessionsStop[!]`
+- `:SessionsStop[!]`
 
   Stops session autosaving if enabled. The current state will be saved before
   stopping.
@@ -174,11 +188,11 @@ have configured my `session_filepath` to be ".nvim/session".
 
 If you want a more automatic solution, or something else, these plugins may interest you:
 
-* [tpope/vim-obsession](https://github.com/tpope/vim-obsession) Very similar,
+- [tpope/vim-obsession](https://github.com/tpope/vim-obsession) Very similar,
   but modifies the session files to always autosave after sourcing.
-* [folke/persistence.nvim](https://github.com/folke/persistence.nvim)
+- [folke/persistence.nvim](https://github.com/folke/persistence.nvim)
   Automatically stores sessions in a shared directory on nvim exit.
-* [rmagatii/auto-session](https://github.com/rmagatti/auto-session)
+- [rmagatii/auto-session](https://github.com/rmagatti/auto-session)
   Automatically stores sessions in a shared directory.
-* [Shatur/neovim-session-manager](https://github.com/Shatur/neovim-session-manager)
+- [Shatur/neovim-session-manager](https://github.com/Shatur/neovim-session-manager)
   Saves sessions and manages workspaces.
